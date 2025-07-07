@@ -11,31 +11,33 @@ export default function handler(req, res) {
   
   try {
     if (method === 'POST') {
-      const { coach_id, event_type, event_name, properties } = req.body;
-      console.log('Event tracked:', { coach_id, event_type, event_name });
+      const { email_type, recipient } = req.body;
+      
+      if (!email_type || !recipient) {
+        return res.status(400).json({ error: 'email_type and recipient required' });
+      }
+      
+      console.log('Email simulated:', { email_type, recipient });
       
       return res.status(200).json({
         success: true,
-        message: 'Event tracked successfully',
-        event_id: 'evt_' + Date.now()
+        message: 'Email sent successfully (simulated)',
+        email_id: 'email_' + Date.now()
       });
     }
     
     if (method === 'GET') {
-      const { coach_id, period, type } = req.query;
-      
       return res.status(200).json({
         success: true,
-        period: period || '30d',
-        data: {
-          overview: {
-            total_clients: 3,
-            new_clients: 1,
-            ai_sessions: 8,
-            active_days: 5,
-            engagement_rate: 2.7
+        emails: [
+          {
+            id: 'email_001',
+            email_type: 'coach_welcome',
+            recipient: 'test@example.com',
+            status: 'sent',
+            created_at: new Date().toISOString()
           }
-        }
+        ]
       });
     }
     
