@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard - KI-Online.Coach</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .test-header {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid #FFD700;
+        }
+
+        .status-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .log-display {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 TEST DASHBOARD</h1>
+        <p>Integration Test für Trial Manager & API</p>
+    </div>
+
+    <div class="status-display">
+        <h2>📊 Status Dashboard</h2>
+        <p id="coachInfo">Coach-Daten werden geladen...</p>
+        <p id="trialInfo">Trial-Daten werden geladen...</p>
+        
+        <div>
+            <button class="test-button" onclick="testCoachData()">🔍 Coach Daten testen</button>
+            <button class="test-button" onclick="testTrialAPI()">📡 Trial API testen</button>
+            <button class="test-button" onclick="testTrialManager()">🎯 Trial Manager testen</button>
+            <button class="test-button" onclick="clearLogs()">🗑️ Logs löschen</button>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>👤 Coach Status</h3>
+            <p id="coachStatus">Unbekannt</p>
+        </div>
+        <div class="info-card">
+            <h3>⏰ Trial Status</h3>
+            <p id="trialStatus">Unbekannt</p>
+        </div>
+        <div class="info-card">
+            <h3>📅 Tage übrig</h3>
+            <p id="daysLeft">--</p>
+        </div>
+        <div class="info-card">
+            <h3>🔗 Integration</h3>
+            <p id="integrationStatus">Wird getestet...</p>
+        </div>
+    </div>
+
+    <div class="log-display" id="logDisplay">
+        <div>🚀 Test Dashboard geladen</div>
+        <div>⏳ Warte auf Tests...</div>
+    </div>
+
+    <!-- Trial Manager laden (falls vorhanden) -->
+    <script src="trial-manager.js"></script>
+
+    <script>
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+            
+            const logDisplay = document.getElementById('logDisplay');
+            const div = document.createElement('div');
+            div.textContent = logEntry;
+            
+            if (type === 'error') div.style.color = '#ff4444';
+            if (type === 'success') div.style.color = '#44ff44';
+            if (type === 'warning') div.style.color = '#ffaa44';
+            
+            logDisplay.appendChild(div);
+            logDisplay.scrollTop = logDisplay.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs = [];
+            document.getElementById('logDisplay').innerHTML = '<div>🗑️ Logs gelöscht</div>';
+        }
+
+        function updateStatus(elementId, value, isGood = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = value;
+            element.style.color = isGood ? '#4CAF50' : '#f44336';
+        }
+
+        // Test 1: Coach Daten
+        function testCoachData() {
+            log('🔍 Testing Coach Data Sources...', 'info');
+            
+            // URL Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const coachId = urlParams.get('coachId');
+            const email = urlParams.get('email');
+            
+            if (coachId) {
+                log(`✅ URL: Coach ID = ${coachId}`, 'success');
+                log(`✅ URL: Email = ${email}`, 'success');
+                updateStatus('coachStatus', `${coachId.substring(0, 8)}...`);
+                document.getElementById('coachInfo').textContent = `Coach: ${email} (aus URL)`;
+                return { id: coachId, email: email, source: 'url' };
+            }
+            
+            // SessionStorage
+            const sessionData = sessionStorage.getItem('coachData');
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    log(`✅ Session: ${JSON.stringify(parsed)}`, 'success');
+                    updateStatus('coachStatus', `${parsed.coachId?.substring(0, 8) || 'No ID'}...`);
+                    document.getElementById('coachInfo').textContent = `Coach: ${parsed.email} (aus Session)`;
+                    return parsed;
+                } catch (e) {
+                    log(`❌ Session parsing error: ${e.message}`, 'error');
+                }
+            }
+            
+            // LocalStorage
+            const localData = localStorage.getItem('currentCoach');
+            if (localData) {
+                try {
+                    const parsed = JSON.parse(localData);
+                    log(`✅ Local: ${JSON.stringify(parsed)}`, 'success');
+                    updateStatus('coachStatus', `${parsed.id?.substring(0, 8) || 'No ID'}...`);
+                    document.getElementById('coachInfo').textContent = `Coach: ${parsed.email} (aus Local)`;
+                    return parsed;
+                } catch (e) {
+                    log(`❌ Local parsing error: ${e.message}`, 'error');
+                }
+            }
+            
+            log('❌ No coach data found!', 'error');
+            updateStatus('coachStatus', 'Nicht gefunden', false);
+            document.getElementById('coachInfo').textContent = 'Keine Coach-Daten gefunden';
+            return null;
+        }
+
+        // Test 2: Trial API
+        async function testTrialAPI() {
+            log('📡 Testing Trial Management API...', 'info');
+            
+            const coachData = testCoachData();
+            if (!coachData || !coachData.id) {
+                log('❌ No coach ID for API test', 'error');
+                return;
+            }
+            
+            const coachId = coachData.id || coachData.coachId;
+            log(`🔍 Testing API with Coach ID: ${coachId}`, 'info');
+            
+            try {
+                const url = `/api/trial-management?coachId=${coachId}`;
+                log(`📡 Calling: ${url}`, 'info');
+                
+                const response = await fetch(url);
+                log(`📡 Response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    log(`❌ API Error: ${response.status} ${response.statusText}`, 'error');
+                    updateStatus('trialStatus', 'API Fehler', false);
+                    return;
+                }
+                
+                const data = await response.json();
+                log(`📊 API Response: ${JSON.stringify(data, null, 2)}`, 'success');
+                
+                if (data.success && data.trial) {
+                    const trial = data.trial;
+                    updateStatus('trialStatus', trial.status);
+                    updateStatus('daysLeft', trial.days_left);
+                    document.getElementById('trialInfo').textContent = 
+                        `Trial: ${trial.status} - ${trial.days_left} Tage (${trial.email})`;
+                    log(`✅ Trial data loaded successfully!`, 'success');
+                    return trial;
+                } else {
+                    log(`❌ API returned no trial data`, 'error');
+                    updateStatus('trialStatus', 'Keine Daten', false);
+                }
+                
+            } catch (error) {
+                log(`❌ API call failed: ${error.message}`, 'error');
+                updateStatus('trialStatus', 'Verbindungsfehler', false);
+            }
+        }
+
+        // Test 3: Trial Manager
+        function testTrialManager() {
+            log('🎯 Testing Trial Manager Integration...', 'info');
+            
+            if (window.trialManager) {
+                log('✅ Trial Manager found!', 'success');
+                log(`📝 Trial Manager type: ${typeof window.trialManager}`, 'info');
+                
+                // Test methods
+                const methods = ['showTrialModal', 'getTrialStatus', 'refreshTrialStatus'];
+                methods.forEach(method => {
+                    if (typeof window.trialManager[method] === 'function') {
+                        log(`✅ Method available: ${method}`, 'success');
+                    } else {
+                        log(`❌ Method missing: ${method}`, 'warning');
+                    }
+                });
+                
+                // Try to get trial status
+                try {
+                    const status = window.trialManager.getTrialStatus();
+                    if (status) {
+                        log(`📊 Trial Manager status: ${JSON.stringify(status)}`, 'success');
+                        updateStatus('integrationStatus', 'Funktioniert');
+                    } else {
+                        log(`⚠️ Trial Manager has no status data yet`, 'warning');
+                        updateStatus('integrationStatus', 'Keine Daten');
+                    }
+                } catch (e) {
+                    log(`❌ Trial Manager error: ${e.message}`, 'error');
+                    updateStatus('integrationStatus', 'Fehler', false);
+                }
+                
+            } else {
+                log('❌ Trial Manager not found!', 'error');
+                updateStatus('integrationStatus', 'Nicht gefunden', false);
+                
+                // Check if script was loaded
+                const scripts = document.querySelectorAll('script[src="trial-manager.js"]');
+                if (scripts.length === 0) {
+                    log('❌ trial-manager.js script not found in DOM', 'error');
+                } else {
+                    log(`⚠️ trial-manager.js script found but window.trialManager not available`, 'warning');
+                }
+            }
+        }
+
+        // Auto-run tests on load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🎯 DOM ready - starting auto tests...', 'info');
+            
+            setTimeout(() => {
+                testCoachData();
+            }, 500);
+            
+            setTimeout(() => {
+                testTrialAPI();
+            }, 1000);
+            
+            setTimeout(() => {
+                testTrialManager();
+            }, 2000);
+        });
+
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            log(`💥 Global Error: ${e.message}`, 'error');
+        });
+
+        log('✅ Test Dashboard ready!', 'success');
+    </script>
+</body>
+</html>

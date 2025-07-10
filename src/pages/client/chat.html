@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuhestandSynth Coaching</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .session-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+            min-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.coach {
+            align-items: flex-start;
+        }
+
+        .message.ki {
+            align-items: flex-start;
+        }
+
+        .message.klient {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.coach .message-bubble {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .message.ki .message-bubble {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #333;
+        }
+
+        .message.klient .message-bubble {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .message-author {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 2px;
+            padding: 0 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 2px;
+            padding: 0 4px;
+        }
+
+        .input-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 16px;
+            color: #333;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FFD700;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #333;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            min-width: 100px;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-indicator.connected {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+        }
+
+        .status-indicator.waiting {
+            background: rgba(255, 193, 7, 0.9);
+            color: #333;
+        }
+
+        .status-indicator.error {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                padding: 0 10px;
+            }
+
+            .message-bubble {
+                max-width: 90%;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .waiting-message {
+            text-align: center;
+            opacity: 0.7;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">🔄 Verbinden...</div>
+
+    <div class="header">
+        <h1>🤖 RuhestandSynth Coaching</h1>
+        <p>Ihr persönlicher KI-gestützter Coaching-Begleiter</p>
+    </div>
+
+    <div class="session-info">
+        <span id="sessionPhase">Phase 1: Standortbestimmung</span> • 
+        <span id="sessionType">Ruhestandsplanung</span>
+    </div>
+
+    <div class="chat-container">
+        <div class="messages" id="messagesContainer">
+            <div class="waiting-message">
+                Ihr Coach wird Sie durch den Prozess begleiten.<br>
+                RuhestandSynth ist bereit, Ihnen zu helfen.
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container">
+                <textarea 
+                    id="messageInput" 
+                    class="message-input" 
+                    placeholder="Ihre Antwort eingeben..."
+                    rows="1"
+                ></textarea>
+                <button id="sendButton" class="send-button">Antworten</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let sessionId = null;
+        let lastMessageId = null;
+        let isWaiting = false;
+
+        // Initialize klient chat system
+        function initializeKlientChat() {
+            console.log('🎯 Klient Chat Interface initialized');
+            
+            // Read session ID from URL first
+const urlParams = new URLSearchParams(window.location.search);
+const sessionFromUrl = urlParams.get('session');
+
+// Use URL session if available, otherwise generate new one
+sessionId = sessionFromUrl || generateSessionId();
+console.log('🔗 Session ID from URL:', sessionFromUrl);
+            console.log('Session ID:', sessionId);
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Start polling for coach/AI messages
+            startMessagePolling();
+            
+            // Update status
+            updateStatus('connected', '🟢 Verbunden');
+        }
+
+        function generateSessionId() {
+            // Check if we have an existing session
+            let stored = localStorage.getItem('klientSessionId');
+            if (stored) {
+                return stored;
+            }
+            
+            // Generate new session ID
+            const newId = 'session_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('klientSessionId', newId);
+            return newId;
+        }
+
+        function setupEventListeners() {
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+
+            // Send button click
+            sendButton.addEventListener('click', sendMessage);
+
+            // Enter key handling
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    sendMessage();
+                }
+            });
+
+            // Auto-resize textarea
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const content = messageInput.value.trim();
+            
+            if (!content || isWaiting) return;
+
+            // Disable input while sending
+            setWaitingState(true);
+            
+            // Add message to UI immediately
+            addMessage('klient', content);
+            
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Send to server
+            sendMessageToServer(content)
+                .then(() => {
+                    console.log('✅ Message sent successfully');
+                    updateStatus('waiting', '⏳ Warten auf Coach-Antwort');
+                })
+                .catch(error => {
+                    console.error('❌ Error sending message:', error);
+                    updateStatus('error', '❌ Verbindungsfehler');
+                    addMessage('system', 'Fehler beim Senden der Nachricht. Bitte versuchen Sie es erneut.');
+                })
+                .finally(() => {
+                    setWaitingState(false);
+                });
+        }
+
+        async function sendMessageToServer(content) {
+            const response = await fetch('/api/klient-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sessionId: sessionId,
+                    message: content,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        function startMessagePolling() {
+            console.log('🔄 Starting message polling...');
+            
+            // Poll every 2 seconds for new messages
+            setInterval(pollForMessages, 2000);
+            
+            // Initial poll
+            setTimeout(pollForMessages, 1000);
+        }
+
+        async function pollForMessages() {
+            try {
+                const response = await fetch(`/api/send-to-klient-new?sessionId=${sessionId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.success && data.messages && data.messages.length > 0) {
+                        console.log(`📨 Received ${data.messages.length} new messages`);
+                        
+                        data.messages.forEach(message => {
+                            if (message.messageId !== lastMessageId) {
+                                addMessage(message.author, message.content);
+                                lastMessageId = message.messageId;
+                                
+                                // Update status when we receive a message
+                                updateStatus('connected', '🟢 Verbunden');
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error polling messages:', error);
+                updateStatus('error', '❌ Verbindungsfehler');
+            }
+        }
+
+        function addMessage(type, content, timestamp = null) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            // Remove waiting message if present
+            const waitingMessage = messagesContainer.querySelector('.waiting-message');
+            if (waitingMessage) {
+                waitingMessage.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const time = timestamp || new Date().toLocaleTimeString('de-DE', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            let authorName = '';
+            switch(type) {
+                case 'coach': authorName = 'Coach'; break;
+                case 'ki': authorName = 'RuhestandSynth'; break;
+                case 'klient': authorName = 'Sie'; break;
+                case 'system': authorName = 'System'; break;
+            }
+
+            messageDiv.innerHTML = `
+                <div class="message-author">${authorName}</div>
+                <div class="message-bubble">${content}</div>
+                <div class="message-time">${time}</div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            console.log(`💬 Message added: ${type} - ${content.substring(0, 50)}...`);
+        }
+
+        function setWaitingState(waiting) {
+            isWaiting = waiting;
+            const sendButton = document.getElementById('sendButton');
+            const messageInput = document.getElementById('messageInput');
+            
+            sendButton.disabled = waiting;
+            messageInput.disabled = waiting;
+            
+            if (waiting) {
+                sendButton.textContent = 'Senden...';
+                updateStatus('waiting', '📤 Nachricht wird gesendet...');
+            } else {
+                sendButton.textContent = 'Antworten';
+            }
+        }
+
+        function updateStatus(type, text) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            statusIndicator.className = `status-indicator ${type}`;
+            statusIndicator.textContent = text;
+        }
+
+        // Expose functions for debugging
+        window.klientChat = {
+            getSessionId: () => sessionId,
+            addMessage: addMessage,
+            sendMessage: sendMessage,
+            pollForMessages: pollForMessages
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeKlientChat);
+    </script>
+</body>
+</html>

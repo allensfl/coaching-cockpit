@@ -1,4 +1,4 @@
-// api/coach-registration.js - FIXED RESPONSE FORMAT
+// api/coach-registration.js - KOMPLETTER CODE MIT DASHBOARD REDIRECT FIX
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -158,13 +158,13 @@ export default async function handler(req, res) {
     
     console.log('🎯 Sending response to client...');
     
-    // KORREKTES RESPONSE FORMAT - DAS WAR DAS PROBLEM!
+    // KORREKTES RESPONSE FORMAT MIT DASHBOARD REDIRECT + COACH ID
     return res.status(201).json({ 
       success: true, 
       message: emailSent ? 
         'Registrierung erfolgreich! Prüfen Sie Ihr Email-Postfach.' : 
         'Registrierung erfolgreich! Email wird nachgeliefert.',
-      data: {  // ← DAS FEHLTE!
+      data: {
         id: newCoach.id,
         firstName: newCoach.first_name,
         lastName: newCoach.last_name,
@@ -172,7 +172,8 @@ export default async function handler(req, res) {
         trialEnd: newCoach.trial_end,
         emailSent: emailSent
       },
-      redirectUrl: '/coach-dashboard.html'
+      // WICHTIG: Dashboard Redirect mit Coach ID in URL (KORRIGIERTE URL)
+      redirectUrl: `/coach-dashboard.html?coachId=${newCoach.id}&email=${encodeURIComponent(newCoach.email)}&firstName=${encodeURIComponent(newCoach.first_name)}`
     });
 
   } catch (error) {

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Online.Coach - Entwicklung</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 3rem;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .version-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 1.2rem 1.2rem 1.2rem 3rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        
+        .auth-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.2rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .auth-button:active {
+            transform: translateY(0);
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .success {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .note {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #888;
+            line-height: 1.6;
+        }
+        
+        .contact-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <i class="fas fa-robot"></i> KI-Online.Coach
+        </div>
+        <div class="version-badge">
+            <i class="fas fa-code"></i> Development v2.0
+        </div>
+        
+        <div class="subtitle">
+            Diese Seite befindet sich in der aktiven Entwicklung.<br>
+            <strong>Passwort erforderlich für Zugang</strong>
+        </div>
+        
+        <div class="input-group">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" 
+                   class="password-input" 
+                   id="passwordInput" 
+                   placeholder="Entwickler-Passwort eingeben..."
+                   onkeypress="handleKeyPress(event)">
+        </div>
+        
+        <button class="auth-button" onclick="checkPassword()" id="authButton">
+            <i class="fas fa-unlock-alt"></i> Zugang gewähren
+        </button>
+        
+        <div class="loading" id="loadingMsg">
+            <div class="loading-spinner"></div>
+            Authentifizierung läuft...
+        </div>
+        
+        <div class="error" id="errorMsg">
+            <i class="fas fa-exclamation-triangle"></i>
+            Falsches Passwort. Bitte versuche es erneut.
+        </div>
+        
+        <div class="success" id="successMsg">
+            <i class="fas fa-check-circle"></i>
+            Erfolgreich authentifiziert! Weiterleitung...
+        </div>
+        
+        <div class="note">
+            <i class="fas fa-info-circle"></i>
+            Diese Seite wird kontinuierlich weiterentwickelt.<br>
+            Für Feedback und Anregungen stehen wir gerne zur Verfügung.<br><br>
+            
+            <i class="fas fa-envelope"></i>
+            Fragen? <a href="mailto:info@allenspach-coaching.ch" class="contact-link">info@allenspach-coaching.ch</a><br>
+            
+            <i class="fas fa-phone"></i>
+            Tel: <a href="tel:+41793365427" class="contact-link">+41 79 336 54 27</a>
+        </div>
+    </div>
+
+    <script>
+        // 🔐 PASSWORT HIER ÄNDERN:
+        const correctPassword = "sprint1a2025";
+        
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            const loadingMsg = document.getElementById('loadingMsg');
+            const authButton = document.getElementById('authButton');
+            
+            // Reset messages
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            if (input.trim() === '') {
+                showError('Bitte gib ein Passwort ein.');
+                return;
+            }
+            
+            // Loading state
+            loadingMsg.style.display = 'block';
+            authButton.disabled = true;
+            
+            // Simulate authentication delay
+            setTimeout(() => {
+                loadingMsg.style.display = 'none';
+                authButton.disabled = false;
+                
+                if (input === correctPassword) {
+                    // Erfolgreiche Authentifizierung
+                    successMsg.style.display = 'block';
+                    sessionStorage.setItem('authenticated', 'true');
+                    sessionStorage.setItem('authTime', Date.now());
+                    
+                    setTimeout(() => {
+                        window.location.href = 'main.html';
+                    }, 1500);
+                    
+                } else {
+                    // Falsches Passwort
+                    showError('Falsches Passwort. Zugang verweigert.');
+                    document.getElementById('passwordInput').value = '';
+                    document.getElementById('passwordInput').focus();
+                }
+            }, 800);
+        }
+        
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + message;
+            errorMsg.style.display = 'block';
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        }
+        
+        // Session-Check (falls User schon authentifiziert ist)
+        window.onload = function() {
+            const isAuthenticated = sessionStorage.getItem('authenticated');
+            const authTime = sessionStorage.getItem('authTime');
+            const currentTime = Date.now();
+            const sessionDuration = 2 * 60 * 60 * 1000; // 2 Stunden
+            
+            if (isAuthenticated === 'true' && authTime && (currentTime - authTime) < sessionDuration) {
+                // Session noch gültig
+                window.location.href = 'main.html';
+            } else {
+                // Session abgelaufen oder nicht vorhanden
+                sessionStorage.removeItem('authenticated');
+                sessionStorage.removeItem('authTime');
+                document.getElementById('passwordInput').focus();
+            }
+        }
+        
+        // Analytics Event (für später)
+        function trackAuthAttempt(success) {
+            console.log(`Auth attempt: ${success ? 'success' : 'failed'}`);
+        }
+    </script>
+</body>
+</html>

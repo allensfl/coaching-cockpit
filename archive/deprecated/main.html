@@ -791,10 +791,10 @@
             <ul class="nav-links">
                 <li><a href="#coaches">Für Coaches</a></li>
                 <li><a href="#klienten">Für Klienten</a></li>
-                <li><a href="preise.html">Preise</a></li>
+                <li><a href="https://coaching-cockpit-live-v2-3zfsnb2q0-ki-coaching.vercel.app/preise.html">Preise</a></li>
                 <li><a href="#kontakt">Kontakt</a></li>
             </ul>
-            <a href="javascript:alert('Login wird bald verfügbar sein!')" class="cta-button">Login</a>
+            <a href="#" class="cta-button" onclick="showComingSoon(); return false;">Login</a>
         </nav>
     </header>
 
@@ -806,22 +806,12 @@
             Revolutioniere dein Coaching mit KI-gestützter Begleitung. Unser System verbindet künstliche Intelligenz mit menschlicher Expertise für maximalen Coaching-Erfolg. Spezialisiert auf Ruhestandscoaching mit einem 8-Phasen-System.
         </p>
         <div class="hero-buttons">
-            <!-- HAUPTBUTTON: Trial für neue Coaches -->
             <a href="coach-registration.html" class="btn-primary">
                 <i class="fas fa-rocket"></i> 🚀 Jetzt 14 Tage kostenlos testen
             </a>
-        </div>
-        
-        <!-- NEUE TRIAL-INFO BOX -->
-        <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; margin-top: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-            <h3 style="color: #feca57; margin-bottom: 15px; font-size: 1.2rem;">✨ Ihre 14-Tage Trial beinhaltet:</h3>
-            <ul style="list-style: none; text-align: left;">
-                <li style="padding: 5px 0; position: relative; padding-left: 25px;">✓ Komplettes Klienten-Management System</li>
-                <li style="padding: 5px 0; position: relative; padding-left: 25px;">✓ KI-gestützte Session-Planung</li>
-                <li style="padding: 5px 0; position: relative; padding-left: 25px;">✓ Automatisierte Follow-up Emails</li>
-                <li style="padding: 5px 0; position: relative; padding-left: 25px;">✓ Progress Tracking & Analytics</li>
-                <li style="padding: 5px 0; position: relative; padding-left: 25px;">✓ Keine Kreditkarte erforderlich</li>
-            </ul>
+            <a href="chat.html" class="btn-secondary">
+                <i class="fas fa-play"></i> Demo ansehen
+            </a>
         </div>
     </section>
 
@@ -848,8 +838,6 @@
                         <li>Upload eigener Coaching-Materialien</li>
                         <li>DSGVO-konforme Datenverwaltung</li>
                     </ul>
-                    
-                    <!-- GEÄNDERT: Button entfernt (keine Verwirrung mehr) -->
                 </div>
 
                 <!-- Für Klienten -->
@@ -869,8 +857,6 @@
                         <li>Integration mit deinem persönlichen Coach</li>
                         <li>Lernstil-angepasste Begleitung</li>
                     </ul>
-                    
-                    <!-- GEÄNDERT: Button entfernt (keine Verwirrung mehr) -->
                 </div>
             </div>
         </div>
@@ -1166,8 +1152,8 @@
             </div>
             
             <div style="margin-top: 3rem;">
-                <a href="#kontakt" class="btn-primary">
-                    Preise & Pakete anfragen
+                <a href="https://coaching-cockpit-live-v2-3zfsnb2q0-ki-coaching.vercel.app/preise.html" class="btn-primary">
+                    📋 Preise & Pakete ansehen
                 </a>
             </div>
         </div>
@@ -1209,17 +1195,6 @@
         </div>
     </section>
 
-    <!-- CTA Section - NUR EIN BUTTON -->
-    <section style="background: linear-gradient(135deg, #ff6b6b, #feca57); padding: 80px 2rem; color: white; text-align: center;">
-        <div class="container">
-            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Bereit für den nächsten Level?</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                Schließen Sie sich tausenden erfolgreichen Coaches an und revolutionieren Sie Ihr Business noch heute.
-            </p>
-            <a href="coach-registration.html" class="btn-primary">🚀 Jetzt 14 Tage kostenlos testen</a>
-        </div>
-    </section>
-
     <!-- DSGVO Notice -->
     <section class="dsgvo-notice">
         <div class="container">
@@ -1251,6 +1226,16 @@
     </footer>
 
     <script>
+        // Show coming soon alert
+        function showComingSoon() {
+            alert("Login wird bald verfügbar sein! 🚀");
+        }
+
+        // Show coming soon alert
+        function showComingSoon() {
+            alert("Login wird bald verfügbar sein! 🚀");
+        }
+
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
